@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CheckFirst: paste it before you click it</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="logo">✓</span> CheckFirst</div>
+    <div id="engine" class="pill">Checking AI engine…</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Got a weird message or link?<br />Check it first.</h1>
+      <p>Paste a text, email, link or page, or drop a screenshot. CheckFirst reads it on your own device when it can, so your private messages stay private.</p>
+    </section>
+
+    <section class="card">
+      <textarea id="input" rows="7" placeholder="Paste the message, email or link here…"></textarea>
+      <div class="row">
+        <label class="file">
+          <input id="file" type="file" accept="image/png,image/jpeg,application/pdf" />
+          <span id="fileLabel">+ Add screenshot or PDF</span>
+        </label>
+        <label class="toggle"><input id="private" type="checkbox" /> Private mode (on-device only)</label>
+      </div>
+      <div class="row">
+        <button id="check" class="primary">Check it</button>
+        <button id="sample" class="ghost">Try an example</button>
+      </div>
+      <div id="progress" class="muted"></div>
+    </section>
+
+    <section id="result" class="card hidden" aria-live="polite"></section>
+
+    <section class="card how">
+      <h2>How it stays fast and private</h2>
+      <ol>
+        <li><b>Instant scan</b> on your device flags look-alike links, pressure tactics and requests for codes.</li>
+        <li><b>On-device AI</b> (Gemini Nano in Chrome) explains the risk without your message leaving the computer.</li>
+        <li><b>Cloud backup</b> (Gemini) steps in for long emails, PDFs, phones without a local model, or when you ask for a second opinion.</li>
+      </ol>
+    </section>
+
+    <section id="historyWrap" class="card hidden">
+      <h2>Recent checks <small class="muted">(saved only in this browser)</small></h2>
+      <ul id="history"></ul>
+    </section>
+  </main>
+  <footer class="muted">CheckFirst gives guidance, not guarantees. When in doubt, contact the company using a number or site you already trust.</footer>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
