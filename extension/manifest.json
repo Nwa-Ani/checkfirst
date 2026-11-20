@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "CheckFirst: scam and fake-link checker",
+  "short_name": "CheckFirst",
+  "version": "0.1.0",
+  "description": "Right-click any link, selected text or page and check it for scam signs. Runs on your device first, even offline.",
+  "permissions": ["contextMenus", "storage"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "CheckFirst", "default_popup": "result.html" }
+}
