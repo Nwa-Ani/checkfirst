@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "CheckFirst: scam and fake-link checker",
   "short_name": "CheckFirst",
-  "version": "0.3.0",
-  "description": "Right-click a link, selected text or page and check it for scam signs. Runs on your device first, with a cloud fallback.",
+  "version": "0.4.0",
+  "description": "Right-click a link, selected text or page. Check messages for scam signs, or check whether a website looks genuine.",
   "permissions": [
     "contextMenus",
     "storage"
@@ -14,7 +14,8 @@
     "https://firebaseappcheck.googleapis.com/*",
     "https://firebaseinstallations.googleapis.com/*",
     "http://127.0.0.1:8787/*",
-    "http://localhost:8787/*"
+    "http://localhost:8787/*",
+    "https://checkfirst-appcheck.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js",

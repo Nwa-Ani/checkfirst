@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { scan } from '../src/heuristics.js';
 import { SAMPLES, getSample } from '../src/samples.js';
-import { parseCheckHash, buildCheckUrl } from '../src/hash.js';
+import { parseCheckHash, parseSiteHash, parseAppHash, buildCheckUrl, buildSiteCheckUrl } from '../src/hash.js';
 
 test('four demo samples are available', () => {
   assert.equal(SAMPLES.length, 4);
@@ -36,4 +36,12 @@ test('buildCheckUrl puts the text in the fragment, not the query', () => {
   const url = buildCheckUrl('https://example.com/app/', 'a&b=c');
   assert.equal(url, 'https://example.com/app/#check=a%26b%3Dc');
   assert.ok(!url.includes('?'), url);
+});
+
+test('site hash and builder stay in the fragment', () => {
+  assert.equal(parseSiteHash('#site=https%3A%2F%2Fgoogle.com'), 'https://google.com');
+  assert.equal(buildSiteCheckUrl('https://example.com/app/', 'https://google.com'), 'https://example.com/app/#site=https%3A%2F%2Fgoogle.com');
+  assert.equal(parseAppHash('#site=google.com').mode, 'site');
+  assert.equal(parseAppHash('#check=Hello', () => false).mode, 'message');
+  assert.equal(parseAppHash('#check=google.com', () => true).mode, 'site');
 });

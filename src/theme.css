@@ -19,8 +19,12 @@
   --safe-dim: rgba(47, 208, 198, 0.14);
   --caution: #F2C14E;
   --caution-dim: rgba(242, 193, 78, 0.14);
+  --risky: #FF8A4C;
+  --risky-dim: rgba(255, 138, 76, 0.16);
   --scam: #FF5D73;
   --scam-dim: rgba(255, 93, 115, 0.14);
+  --malicious: #FF2D55;
+  --malicious-dim: rgba(255, 45, 85, 0.16);
   --cloud: #8BB4FF;
   --cloud-dim: rgba(139, 180, 255, 0.14);
   --device: #2FD0C6;
@@ -133,9 +137,28 @@ button.ghost { background: transparent; }
   background-size: 6px 6px;
   background-blend-mode: overlay;
 }
-.res[data-verdict="likely_safe"] .chips li {
+.res[data-verdict="likely_safe"] .chips li,
+.res[data-verdict="good"] .chips li {
   background: var(--safe-dim);
   border-color: rgba(47, 208, 198, 0.35);
+}
+.res[data-verdict="cautious"] .chips li {
+  background: var(--caution-dim);
+  border-color: rgba(242, 193, 78, 0.4);
+}
+.res[data-verdict="risky"] .chips li {
+  background: var(--risky-dim);
+  border-color: rgba(255, 138, 76, 0.45);
+}
+.res[data-verdict="bad"] .chips li,
+.res[data-verdict="malicious"] .chips li {
+  background: var(--scam-dim);
+  border-color: rgba(255, 93, 115, 0.35);
+  border-style: dashed;
+}
+.res[data-verdict="malicious"] .chips li {
+  background: var(--malicious-dim);
+  border-color: rgba(255, 45, 85, 0.45);
 }
 
 .gauge {
@@ -146,7 +169,16 @@ button.ghost { background: transparent; }
 }
 .gauge[data-verdict="scam"] { --ring: var(--scam); }
 .gauge[data-verdict="suspicious"] { --ring: var(--caution); }
-.gauge[data-verdict="likely_safe"] { --ring: var(--safe); }
+.gauge[data-verdict="likely_safe"], .gauge[data-verdict="good"],
+.site-mark[data-verdict="good"] { --ring: var(--safe); }
+.gauge[data-verdict="cautious"],
+.site-mark[data-verdict="cautious"] { --ring: var(--caution); }
+.gauge[data-verdict="risky"],
+.site-mark[data-verdict="risky"] { --ring: var(--risky); }
+.gauge[data-verdict="bad"],
+.site-mark[data-verdict="bad"] { --ring: var(--scam); }
+.gauge[data-verdict="malicious"],
+.site-mark[data-verdict="malicious"] { --ring: var(--malicious); }
 .gauge svg { width: 100%; height: auto; display: block; transform: rotate(-90deg); }
 .gauge-track {
   fill: none;
@@ -175,7 +207,15 @@ button.ghost { background: transparent; }
   stroke-linejoin: round;
 }
 .gauge[data-verdict="scam"] .gauge-mark { d: path("M53 53l14 14M67 53l-14 14"); }
-.gauge[data-verdict="suspicious"] .gauge-mark { d: path("M60 50v10M60 68v1"); stroke-width: 6; }
+.gauge[data-verdict="suspicious"] .gauge-mark,
+.gauge[data-verdict="cautious"] .gauge-mark,
+.gauge[data-verdict="risky"] .gauge-mark,
+.site-mark[data-verdict="cautious"] .gauge-mark,
+.site-mark[data-verdict="risky"] .gauge-mark { d: path("M60 50v10M60 68v1"); stroke-width: 6; }
+.gauge[data-verdict="bad"] .gauge-mark,
+.gauge[data-verdict="malicious"] .gauge-mark,
+.site-mark[data-verdict="bad"] .gauge-mark,
+.site-mark[data-verdict="malicious"] .gauge-mark { d: path("M53 53l14 14M67 53l-14 14"); }
 .gauge-score {
   position: absolute;
   left: 0;
@@ -200,7 +240,11 @@ button.ghost { background: transparent; }
 }
 .verdict-copy h2.scam { color: var(--scam); }
 .verdict-copy h2.suspicious { color: var(--caution); }
-.verdict-copy h2.likely_safe { color: var(--safe); }
+.verdict-copy h2.likely_safe, .verdict-copy h2.good { color: var(--safe); }
+.verdict-copy h2.cautious { color: var(--caution); }
+.verdict-copy h2.risky { color: var(--risky); }
+.verdict-copy h2.bad { color: var(--scam); }
+.verdict-copy h2.malicious { color: var(--malicious); }
 .verdict-meta { color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 
 .result-head {
@@ -238,4 +282,21 @@ button.ghost { background: transparent; }
   .result-head { flex-direction: column; text-align: center; }
   .verdict-meta { justify-content: center; }
   .gauge { width: 148px; flex-basis: 148px; }
+  .site-mark { width: 112px; flex-basis: 112px; }
+}
+
+.site-mark {
+  --ring: var(--brand);
+  width: 132px;
+  flex: 0 0 132px;
+  position: relative;
+}
+.site-mark svg { width: 100%; height: auto; display: block; }
+.site-mark .gauge-shield { transform: none; transform-origin: 60px 60px; fill: var(--ring); filter: drop-shadow(0 0 10px var(--ring)); }
+.site-mark .gauge-mark { transform: none; transform-origin: 60px 60px; stroke: var(--bg); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.host-line {
+  font-family: var(--font);
+  color: var(--ink);
+  font-weight: 600;
+  word-break: break-all;
 }
