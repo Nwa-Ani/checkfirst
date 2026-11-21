@@ -35,3 +35,7 @@ Load `dist-extension/` as an unpacked extension. The ID should be `aahdbhdmlfbla
 5. After the service has a public HTTPS URL, rebuild the extension with `VITE_APPCHECK_TOKEN_URL=https://<service>/appcheck-token` and `VITE_PUBLIC_SITE_URL` set to the hosted site, then load or ship that `dist-extension` build.
 
 The service account can mint App Check tokens for the web app. Treat it as a secret, never commit it, and keep rate limits plus origin checks enabled.
+
+## Website checks (`POST /url-check`)
+
+The same origin allowlist and per-IP rate limit protect this route. The body is `{ "url": "https://example.com" }`. The helper calls Google Safe Browsing Lookup API v4 with `SAFE_BROWSING_API_KEY` and, when it can, looks up domain age on RDAP (no key needed). The key never leaves the server. If the key is missing, the response still succeeds and sets `safeBrowsing.configured` to `false`.

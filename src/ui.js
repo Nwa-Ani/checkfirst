@@ -26,6 +26,17 @@ export function chipsHtml(flags) {
   return `<ul class="chips">${flags.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>`;
 }
 
+export function siteMarkHtml(verdict, host) {
+  const title = LABEL[verdict] || 'Check result';
+  const safeHost = host ? `, ${host}` : '';
+  return `<div class="site-mark" data-verdict="${esc(verdict)}">
+    <svg viewBox="0 0 120 120" role="img" aria-label="${esc(title)}${esc(safeHost)}">
+      <path class="gauge-shield" d="M60 22l22 8v18c0 14-9 24.5-22 28-13-3.5-22-14-22-28V30l22-8z"></path>
+      <path class="gauge-mark" d="M50 59l7 7 14-14" fill="none"></path>
+    </svg>
+  </div>`;
+}
+
 export function sourceBadgeHtml(source) {
   const kind = sourceKind(source);
   const label = sourceLabel(source);

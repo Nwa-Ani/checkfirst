@@ -54,6 +54,35 @@ const deviceSchema = {
   required: ['verdict', 'risk_score', 'scam_type', 'summary', 'red_flags', 'what_to_do'],
 };
 
+const SITE_SYSTEM = `You are CheckFirst, a calm safety assistant for everyday people.
+A user asked whether a website looks genuine. Read the URL and the signals already collected
+(Google Safe Browsing, the address structure, and domain age if present).
+Be specific and plain-spoken. Never ask for personal data.
+If Safe Browsing already flagged the address, the verdict must be malicious.
+Reply in the same language as the user.`;
+
+const SITE_VERDICTS = ['good', 'cautious', 'risky', 'bad', 'malicious'];
+
+const siteCloudSchema = Schema.object({
+  properties: {
+    verdict: Schema.enumString({ enum: SITE_VERDICTS }),
+    reason: Schema.string(),
+    signals: Schema.array({ items: Schema.string() }),
+    what_to_do: Schema.array({ items: Schema.string() }),
+  },
+});
+
+const siteDeviceSchema = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string', enum: SITE_VERDICTS },
+    reason: { type: 'string' },
+    signals: { type: 'array', items: { type: 'string' }, maxItems: 8 },
+    what_to_do: { type: 'array', items: { type: 'string' }, maxItems: 4 },
+  },
+  required: ['verdict', 'reason', 'signals', 'what_to_do'],
+};
+
 let models = null;
 
 async function fetchHelperAppCheckToken() {
@@ -130,6 +159,27 @@ function init() {
     cloud: getGenerativeModel(ai, { mode: InferenceMode.ONLY_IN_CLOUD, inCloudParams }),
   };
   return models;
+}
+
+let siteModels = null;
+
+function initSite() {
+  if (siteModels || !isConfigured) return siteModels;
+  init();
+  const app = getApp();
+  const ai = getAI(app, { backend: new GoogleAIBackend() });
+  const generationConfig = { responseMimeType: 'application/json', responseSchema: siteCloudSchema, temperature: 0.2 };
+  const inCloudParams = { model: CLOUD_MODEL, systemInstruction: SITE_SYSTEM, generationConfig };
+  const onDeviceParams = {
+    createOptions: { initialPrompts: [{ role: 'system', content: SITE_SYSTEM }], expectedInputs: [{ type: 'text' }] },
+    promptOptions: { responseConstraint: siteDeviceSchema },
+  };
+  siteModels = {
+    hybrid: getGenerativeModel(ai, { mode: InferenceMode.PREFER_ON_DEVICE, onDeviceParams, inCloudParams }),
+    privateOnly: getGenerativeModel(ai, { mode: InferenceMode.ONLY_ON_DEVICE, onDeviceParams, inCloudParams }),
+    cloud: getGenerativeModel(ai, { mode: InferenceMode.ONLY_IN_CLOUD, inCloudParams }),
+  };
+  return siteModels;
 }
 
 // Must be called from a user gesture (Chrome user-activation rule).
@@ -214,6 +264,45 @@ export async function analyze({ text, file, localScan, route = 'auto' }) {
   if (file) parts.push(await fileToPart(file));
   const t0 = performance.now();
   const result = await model.generateContent(parts);
+  const ms = Math.round(performance.now() - t0);
+  const raw = result.response.text();
+  const data = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim());
+  const source = normalizeSource(result.response.inferenceSource, forcedCloud || model === m.cloud);
+  const modelName = source === 'in_cloud' ? (model.model || CLOUD_MODEL) : 'gemini-nano';
+  return { data, source, ms, reason, model: modelName };
+}
+
+/**
+ * Review a website address with the same hybrid routing as message checks.
+ * route: 'auto' | 'private' | 'cloud'
+ */
+export async function analyzeSite({ url, collected, route = 'auto' }) {
+  const m = initSite();
+  if (!m) {
+    const err = new Error('NOT_CONFIGURED');
+    err.code = 'NOT_CONFIGURED';
+    throw err;
+  }
+  let model = m.hybrid;
+  let reason = 'On-device first, cloud only if this device has no local model';
+  let forcedCloud = false;
+  if (route === 'private') { model = m.privateOnly; reason = 'Private mode: never leaves this device'; }
+  else if (route === 'cloud') { model = m.cloud; reason = 'Second opinion from cloud Gemini'; forcedCloud = true; }
+
+  const prompt = `Decide if this website looks genuine.
+URL: ${url}
+Signals already collected (JSON): ${JSON.stringify({
+    verdict: collected?.verdict,
+    flags: collected?.flags,
+    safeBrowsing: collected?.safeBrowsing,
+    rdap: collected?.rdap,
+    structure: collected?.structure?.signals || collected?.structure?.flags,
+  })}
+If Safe Browsing reported a match, verdict must be malicious.
+Write a short plain-English reason (two sentences at most) and the signals that matter.
+Return JSON only.`;
+  const t0 = performance.now();
+  const result = await model.generateContent([{ text: prompt }]);
   const ms = Math.round(performance.now() - t0);
   const raw = result.response.text();
   const data = JSON.parse(raw.replace(/^```(json)?|```$/g, '').trim());

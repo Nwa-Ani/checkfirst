@@ -3,6 +3,9 @@ import { cert, initializeApp } from 'firebase-admin/app';
 import { getAppCheck } from 'firebase-admin/app-check';
 import { allowedOrigins, isAllowedOrigin, WEB_APP_ID, EXTENSION_ID, TOKEN_TTL_MS } from './origin.js';
 import { createRateLimiter, clientIp } from './rate-limit.js';
+import { lookupSafeBrowsing, hasSafeBrowsingKey } from './safebrowsing.js';
+import { lookupRdap } from './rdap.js';
+import { createUrlCheckHandler } from './url-check.js';
 
 const PORT = Number(process.env.PORT) || 8787;
 const trustProxy = process.env.TRUST_PROXY === 'true' || process.env.NODE_ENV === 'production';
@@ -32,7 +35,7 @@ loadAdmin();
 const app = express();
 app.disable('x-powered-by');
 if (trustProxy) app.set('trust proxy', 1);
-app.use(express.json({ limit: '1kb' }));
+app.use(express.json({ limit: '8kb' }));
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -50,8 +53,22 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (_req, res) => {
-  res.json({ ok: true, service: 'checkfirst-appcheck' });
+  res.json({
+    ok: true,
+    service: 'checkfirst-appcheck',
+    urlCheck: hasSafeBrowsingKey(),
+  });
 });
+
+const handleUrlCheck = createUrlCheckHandler({
+  allowOrigin,
+  rateLimit,
+  trustProxy,
+  lookupSafeBrowsing,
+  lookupRdap,
+  clientIp,
+});
+app.post('/url-check', handleUrlCheck);
 
 app.post('/appcheck-token', async (req, res) => {
   const origin = req.headers.origin;

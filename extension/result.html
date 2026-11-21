@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CheckFirst</title>
 </head>
-<body>
+<body class="mode-message">
   <div class="atmosphere" aria-hidden="true"></div>
   <header class="top">
     <div class="brand">
@@ -17,7 +17,12 @@
     </div>
     <div id="engine" class="pill off">Ready</div>
   </header>
+  <div class="mode-switch" role="tablist" aria-label="What to check">
+    <button type="button" role="tab" id="modeMessage" aria-selected="true">Message</button>
+    <button type="button" role="tab" id="modeSite" aria-selected="false">Website</button>
+  </div>
   <textarea id="input" placeholder="Paste a link, message or invoice text"></textarea>
+  <input id="siteInput" class="site-input" type="text" inputmode="url" autocomplete="url" placeholder="Paste a website address, like google.com" />
   <div class="sample-row" id="sampleRow"></div>
   <div class="row">
     <button type="button" class="primary" id="go">Check it</button>

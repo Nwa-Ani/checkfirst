@@ -31,8 +31,10 @@ function wrapText(ctx, text, maxWidth) {
 }
 
 function verdictColor(verdict) {
-  if (verdict === 'likely_safe') return PALETTE.safe;
-  if (verdict === 'suspicious') return PALETTE.caution;
+  if (verdict === 'likely_safe' || verdict === 'good') return PALETTE.safe;
+  if (verdict === 'suspicious' || verdict === 'cautious') return PALETTE.caution;
+  if (verdict === 'risky') return PALETTE.risky || '#FF8A4C';
+  if (verdict === 'malicious') return PALETTE.malicious || '#FF2D55';
   return PALETTE.scam;
 }
 
@@ -101,20 +103,22 @@ export function drawScamCard(ctx, {
 
   ctx.fillStyle = PALETTE.ivory;
   ctx.font = '600 28px Outfit, Inter, system-ui, sans-serif';
-  const type = scamType && scamType !== 'none' ? scamType : 'Risk check';
-  ctx.fillText(`${type}  ·  Risk ${Math.round(score)}/100`, 80, y + 10);
+  const isSite = ['good', 'cautious', 'risky', 'bad', 'malicious'].includes(verdict);
+  const type = scamType && scamType !== 'none' ? scamType : (isSite ? 'Website check' : 'Risk check');
+  ctx.fillText(isSite ? type : `${type}  ·  Risk ${Math.round(score)}/100`, 80, y + 10);
   y += 70;
 
-  // Gauge bar
-  const barX = 80, barY = y, barW = W - 160, barH = 18;
-  ctx.fillStyle = 'rgba(243,238,228,0.08)';
-  roundRect(ctx, barX, barY, barW, barH, 9);
-  ctx.fill();
-  ctx.fillStyle = color;
-  const filled = Math.max(8, (barW * Math.max(0, Math.min(100, score))) / 100);
-  roundRect(ctx, barX, barY, filled, barH, 9);
-  ctx.fill();
-  y += 70;
+  if (!isSite) {
+    const barX = 80, barY = y, barW = W - 160, barH = 18;
+    ctx.fillStyle = 'rgba(243,238,228,0.08)';
+    roundRect(ctx, barX, barY, barW, barH, 9);
+    ctx.fill();
+    ctx.fillStyle = color;
+    const filled = Math.max(8, (barW * Math.max(0, Math.min(100, score))) / 100);
+    roundRect(ctx, barX, barY, filled, barH, 9);
+    ctx.fill();
+    y += 70;
+  }
 
   ctx.fillStyle = PALETTE.muted;
   ctx.font = '600 16px Outfit, Inter, system-ui, sans-serif';
