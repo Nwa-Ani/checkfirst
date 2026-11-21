@@ -2,22 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CheckFirst</title>
-<style>
-  body { font: 14px/1.45 system-ui, sans-serif; margin: 0; padding: 16px; width: 380px; color: #1b1f24; background: #fff; }
-  h1 { font-size: 16px; margin: 0 0 10px; }
-  textarea { width: 100%; box-sizing: border-box; min-height: 80px; border: 1px solid #ccd; border-radius: 8px; padding: 8px; font: inherit; }
-  button { margin-top: 8px; border: 0; border-radius: 8px; padding: 8px 14px; background: #1a73e8; color: #fff; font-weight: 600; cursor: pointer; }
-  .verdict { margin: 14px 0 6px; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 15px; }
-  .scam { background: #fde7e9; color: #b3261e; } .suspicious { background: #fff4d6; color: #8a5a00; } .likely_safe { background: #e6f4ea; color: #137333; }
-  ul { padding-left: 18px; margin: 6px 0; } .meta { color: #5f6368; font-size: 12px; } .ai { margin-top: 10px; padding: 10px; border-radius: 8px; background: #f1f3f4; }
-</style>
 </head>
 <body>
-  <h1>CheckFirst</h1>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+        <path d="M32 6l22 8v18c0 14.5-9.2 26.5-22 30.5C19.2 58.5 10 46.5 10 32V14l22-8z" fill="#F2C14E"/>
+        <path d="M22 32.5l7 7 14-14" fill="none" stroke="#080A0F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      CheckFirst
+    </div>
+    <div id="engine" class="pill off">Ready</div>
+  </header>
   <textarea id="input" placeholder="Paste a link, message or invoice text"></textarea>
-  <button id="go">Check it</button>
+  <div class="sample-row" id="sampleRow"></div>
+  <div class="row">
+    <button type="button" class="primary" id="go">Check it</button>
+  </div>
   <div id="out"></div>
-  <script type="module" src="result.js"></script>
+  <script type="module" src="./result.js"></script>
 </body>
 </html>

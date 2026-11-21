@@ -3,3 +3,9 @@ dist
 .env
 .env.local
 .env.*.local
+dist-extension
+*.pem
+server/node_modules
+server/.env
+checkfirst-extension.zip
+*.zip

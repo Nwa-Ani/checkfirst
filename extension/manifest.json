@@ -2,9 +2,27 @@
   "manifest_version": 3,
   "name": "CheckFirst: scam and fake-link checker",
   "short_name": "CheckFirst",
-  "version": "0.1.0",
-  "description": "Right-click any link, selected text or page and check it for scam signs. Runs on your device first, even offline.",
-  "permissions": ["contextMenus", "storage"],
-  "background": { "service_worker": "background.js", "type": "module" },
-  "action": { "default_title": "CheckFirst", "default_popup": "result.html" }
+  "version": "0.3.0",
+  "description": "Right-click a link, selected text or page and check it for scam signs. Runs on your device first, with a cloud fallback.",
+  "permissions": [
+    "contextMenus",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://firebasevertexai.googleapis.com/*",
+    "https://content-firebaseappcheck.googleapis.com/*",
+    "https://firebaseappcheck.googleapis.com/*",
+    "https://firebaseinstallations.googleapis.com/*",
+    "http://127.0.0.1:8787/*",
+    "http://localhost:8787/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "CheckFirst",
+    "default_popup": "result.html"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsN2VUslB2r7JOeEN5/Lgki1VBZUk1DA/Tb3inIxvrgZtgV7CDNmbfUrLwrUOiKHc90PbVCaQy4z6GAMgxsRmigPcwT9rAXlcxuhc59F8/81q8Kp+He5Otwp0jKxnjvFbBn03gws98vAdfx6l8yDR50WlQGsgKNNdYyDORTp+v7Qu7IOAtS3XS7+DH/CsG3kkRVyrIzUK1Ue8BiB8BlO5SN7MllYuBIWYJIMUAYhuFk88Z76ow4um8NKrY+Iqo8MLhZeGTXMc6QLM6xyRDzkRFnyxUEqGh0tve3SFdI1QXHipuJ4F4PWk2PWyy0jo4Ijp4Wb3JwO0UezR2UAXHZX1GQIDAQAB"
 }

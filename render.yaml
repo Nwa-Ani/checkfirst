@@ -1,0 +1,23 @@
+# Blueprint for the App Check helper only.
+# Set FIREBASE_SERVICE_ACCOUNT_JSON and ALLOWED_ORIGINS in the Render dashboard.
+# Do not put the service account in this file.
+services:
+  - type: web
+    name: checkfirst-appcheck
+    runtime: node
+    plan: starter
+    rootDir: server
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
+      - key: EXTENSION_ID
+        value: aahdbhdmlfblabbdhoffijbkndlenjcf
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
